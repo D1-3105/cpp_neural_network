@@ -14,36 +14,38 @@
 namespace nn_neuron {
     using namespace Eigen;
 
-    template<typename WeightType, long long inputs, long long outputs>
+    template<typename T, size_t inputs, size_t outputs>
     class Neuron {
     private:
-        std::function<WeightType (WeightType)> activation_;
-        Matrix<WeightType, 1, inputs> weights_;
+        std::function<T(T)> activation_;
+        Matrix<T, 1, inputs> weights_;
     public:
-        Neuron(
-                Matrix<WeightType, 1, inputs>& weights,
-                std::function<WeightType (WeightType)> activation
-        ): weights_(weights), activation_(activation) {};
+        Neuron() : activation_([](T x) { return x; }), weights_(Matrix<T, 1, inputs>::Random()) {}
 
-        explicit Neuron(std::function<Matrix<WeightType, outputs, inputs> (Matrix<WeightType, 1, inputs>)> activation) {
-            Matrix<WeightType, 1, inputs> init_weights;
-            Neuron(init_weights, activation);
-        };
+        explicit Neuron(std::function<T(T)> activation)
+                : activation_(activation), weights_(Matrix<T, 1, inputs>::Random()) {}
 
-        WeightType Transform(Matrix<WeightType, 1, inputs> input_matrix) {
-            Matrix<WeightType, 1, inputs> weight_normalized_input = input_matrix + weights_;
+        Neuron(Matrix<T, 1, inputs>& weights, std::function<T(T)> activation)
+                : weights_(weights), activation_(activation) {}
+
+        void setActivation(std::function<T(T)> activation) {
+            activation_ = activation;
+        }
+
+        T Transform(const Matrix<T, 1, inputs>& input_matrix) {
+            Matrix<T, 1, inputs> weight_normalized_input = input_matrix + weights_;
             return activation_(weight_normalized_input.sum());
         };
 
-        Matrix<WeightType, 1, inputs> GetWeights() {
+        Matrix<T, 1, inputs> GetWeights() {
             return weights_;
         }
 
-        void SetWeights(Matrix<WeightType, 1, inputs>& new_weights) {
+        void SetWeights(Matrix<T, 1, inputs>& new_weights) {
             weights_ = new_weights;
         }
 
-        static std::tuple<long, long> size(){
+        static const std::tuple<size_t, size_t> size() {
             return {inputs, outputs};
         }
     };
