@@ -14,13 +14,13 @@ protected:
     using NeuronClass = nn_neuron::Neuron<float, 10, 1>;
     using HiddenLayerClass = nn_layer::HiddenLayer<NeuronClass, float>;
 
-    IOFormat CommaInitFmt;
+    IOFormat TensorPrintFMT;
 
     std::shared_ptr<nn_layer::HiddenLayer<NeuronClass, float>> hidden_layer_ptr_;
 
     void SetUp() override {
         auto activation = std::function<float(float)>(ActivationSigmoid);
-        CommaInitFmt = IOFormat(StreamPrecision, DontAlignCols, ", ", ", ", "", "", " [ ", "]");
+        TensorPrintFMT = IOFormat(4, 0, ", ", ", ", "[", "]");
 
         hidden_layer_ptr_ = std::make_shared<HiddenLayerClass>(10, activation);
     }
@@ -42,7 +42,7 @@ TEST_F(LayerTest, test_io) {
     input << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0;
     in.SetCurrentInput(input);
     Matrix<float, 10, 1> output = in.PassInput<HiddenLayerClass, float>(*hidden_layer_ptr_);
-    std::cout << output.format(CommaInitFmt) << std::endl;
+    std::cout << output.format(TensorPrintFMT) << std::endl;
 
     nn_layer::OutputLayer<float, 10, 1> output_layer(output);
 }
