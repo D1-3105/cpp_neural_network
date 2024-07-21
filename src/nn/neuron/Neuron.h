@@ -33,7 +33,7 @@ namespace nn_neuron {
         }
 
         T Transform(const Matrix<T, 1, inputs>& input_matrix) {
-            Matrix<T, 1, inputs> weight_normalized_input = input_matrix + weights_;
+            Matrix<T, 1, inputs> weight_normalized_input = input_matrix.cwiseProduct(weights_);
             return activation_(weight_normalized_input.sum());
         };
 
